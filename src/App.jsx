@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./App.css";
 
 function App() {
@@ -6,24 +6,33 @@ function App() {
   const [numberAllowed, setNumberAllowed] = useState(false);
   const [charAllowed, setCharAllowed] = useState(false);
   const [Password, setPassword] = useState("");
+// useRef hook 
+const passwordRef  = useRef(null);
 
   const PasswordGenerator = useCallback(() => {
     let pass = "";
     let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-    if (numberAllowed) str + "0123456789";
-    if (charAllowed) str + "!@#$%^&*()_+-=";
+    if (numberAllowed) str += "0123456789";
+    if (charAllowed) str += "!@#$%^&*()_+-=";
 
     for (let i = 0; i < length; i++) {
-      let char = math.floor(Math.random() * str.length) + 1;
-      pass = str.charAt(char)
-
-
+      let char = Math.floor(Math.random() * str.length);
+      pass += str.charAt(char)
 
     }
     setPassword(pass);
 
   }, [length, charAllowed, numberAllowed, setPassword]);
+
+
+const copyPasswordToClipboard = useCallback(()=>{
+  passwordRef.current?.select()
+  passwordRef.current?.setSelectionRange(0,3)
+window.navigator.clipboard.writeText(Password)
+},[Password])
+
+  useEffect(()=>{ PasswordGenerator()}, [length, charAllowed, numberAllowed])
   return (
     <>
       <h1 className="text-4xl text-center text-white">Password Generator</h1>
@@ -33,8 +42,8 @@ function App() {
 
         <div className="flex shadow-rounded-lg overflow-hidden mb-4">
 
-          <input type="text" value={Password} className="outline-none w-full py-1 px-3 rounded" placeholder="Password" readOnly />
-          <button className="outline-none bg-blue-700 text-white px-3 py-0.5 shrink-0 rounded">Copy</button>
+          <input type="text" value={Password}   ref={passwordRef} className="outline-none w-full py-1 px-3 rounded" placeholder="Password" readOnly />
+          <button className="outline-none bg-blue-700 text-white px-3 py-0.5 shrink-0 rounded" onClick={copyPasswordToClipboard}  >Copy</button>
         </div>
 
         <div className="flex gap-x-2 text-sm">
